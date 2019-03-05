@@ -48,7 +48,7 @@ class App extends Component {
             <h1 class="display-4">Send Message</h1>
             <div class="jumbotron">
                 <br/>
-                <input id = "name" class="form-control" placeholder="Name" ref = {this.GetInputRef}/>
+                <input id = "name" class="form-control" placeholder="Name"/>
                 <br/>
                 <textarea id = "message" class="form-control" placeholder="Your Message Here"></textarea>
                 <br/>

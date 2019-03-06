@@ -4,24 +4,23 @@ var app = express();
 const bodyParser = require('body-parser');
 var htttp = require('http');
 
-
 app.use(cors())
 app.use(express.static('public'));
 app.use(bodyParser.json())
 
 
 var messages = [{
-    nickname : "2",
-    message : "2"
+    nickname : "nickname",
+    message : "message"
   }];
 
 
-app.get('/message', function (req, res) {
+app.get('/messages', function (req, res) {
   res.send(messages);
 });
 
 
-app.post('/message',function(req, res){
+app.post('/messages',function(req, res){
   app.use(bodyParser.json())
 
   req.body.timestamp = new Date().getTime();

@@ -51,7 +51,7 @@ class Input extends Component{
         return (
         <div className="jumbotron">
             <br/>
-            <input id = "name" className="form-control" placeholder="Name" ref = {nick => this.nickname = nick} onChange = {console.log(this.nick)}/>
+            <input id = "name" className="form-control" placeholder="Name" ref = {nick => this.nickname = nick}/>
             <br/>
             <textarea id = "message" className="form-control" placeholder="Your Message Here" ref = {msg => this.message = msg}></textarea>
             <br/>

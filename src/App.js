@@ -47,19 +47,31 @@ class Chat extends Component {
 
 class Input extends Component{
 
+    sendData() {
+        console.log(this.nickname.value, this.message.value)
+        fetch("http://localhost:4000/messages",
+        {
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            },
+            method: "POST",
+            body: JSON.stringify({nickname: this.nickname.value, message: this.message.value})
+        })
+    }
+
     render() {
         return (
         <div className="jumbotron">
             <br/>
-            <input id = "name" className="form-control" placeholder="Name" ref = {nick => this.nickname = nick}/>
+            <input id = "name" className="form-control" placeholder="Name" ref = {input => this.nickname = input}/>
             <br/>
             <textarea id = "message" className="form-control" placeholder="Your Message Here" ref = {msg => this.message = msg}></textarea>
             <br/>
-            <button className="btn btn-success" onClick = {sendData}>Send</button>
+            <button className="btn btn-success" onClick = {this.sendData.bind(this)}>Send</button>
         </div>
     )}
 }
-// let ChatMessage = props => <div>{this.state.data.length ? this.state.data.map(msg => <div>{msg.nickname} : {msg.message}</div>): "loading..."}</div>
 
 class App extends Component {
   render() {

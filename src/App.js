@@ -3,22 +3,6 @@ import logo from './logo.svg';
 import './App.css';
 // import index from './index.js'
 
-function sendData() {
-  var msg = document.getElementById('message').value
-  var name = document.getElementById('name').value
-  console.log(msg, name)
-  fetch("http://localhost:4000/messages",
-    {
-        headers: {
-          'Accept': 'application/json',
-          'Content-Type': 'application/json'
-        },
-        method: "POST",
-        body: JSON.stringify({nickname: name, message: msg})
-    })
-
-}
-
 let delay = ms => new Promise (r => setTimeout(() => r(ms), ms))
 
 class Chat extends Component {
@@ -81,7 +65,6 @@ class App extends Component {
             <Input></Input>
             <Chat></Chat>
         </div>
-
     );
   }
 }

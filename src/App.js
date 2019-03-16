@@ -6,6 +6,42 @@ import {createStore, combineReducers} from 'redux';
 
 let delay = ms => new Promise (r => setTimeout(() => r(ms), ms))
 
+let store = createStore((state, action) => { //единственный редьюсер данного хранилища
+    if (state === undefined){ //redux запускает редьюсер хотя бы раз, что бы инициализировать хранилище
+        return {sendStatus: "EMPTY"};  //обязательно вернуть новый объект, а не изменить текущий state
+    }
+    if (action.type === 'SEND_STATUS'){ //в каждом action должен быть type
+        return {sendStatus: action.sendStatus} //создаем новый объект базируясь на данных из предыдущего состояния
+    }
+    return state; //редьюсеров может быть несколько, в таком случае вызываются все редьюсеры, но далеко не всегда action.type будет относится к этому редьюсеру. Тогда редьюсер должен вернуть state как есть.
+})
+
+store.subscribe(()=> console.log(store.getState()))
+
+function action(name, msg){
+    fetch("http://localhost:4000/messages",
+       {
+           headers: {
+               'Accept': 'application/json',
+               'Content-Type': 'application/json'
+           },
+           method: "POST",
+           body: JSON.stringify({nickname: name, message: msg })
+       })
+       .then(() => (
+           store.dispatch({
+           type: "SEND_STATUS",
+           sendStatus:"RESOLVED"
+       })
+   ))
+    return {
+        type: "SEND_STATUS",
+        sendStatus:"PENDING"
+    }
+}
+
+store.dispatch(action())
+
 class Chat extends Component {
     constructor (props) {
         super()
@@ -47,20 +83,6 @@ class Input extends Component{
         this.setState({msg: event.target.value});
     }
 
-
-    // sendData() {
-    //     console.log(this.nickname.value, this.message.value)
-    //     fetch("http://localhost:4000/messages",
-    //     {
-    //         headers: {
-    //             'Accept': 'application/json',
-    //             'Content-Type': 'application/json'
-    //         },
-    //         method: "POST",
-    //         body: JSON.stringify({nickname: this.nickname.value, message: this.message.value})
-    //     })
-    // }
-
     render() {
         return (
             <div className="jumbotron">
@@ -74,15 +96,20 @@ class Input extends Component{
         )
     }
 }
+let View = connect(s => s)(props => <div>{props.sendStatus}</div>)
+let I = connect(null, {onSend: action})(Input)
 
 class App extends Component {
   render() {
     return (
-        <div className="App container">
-            <h1 className="display-4">Send Message</h1>
-            <Input onSend={(nick,msg) => console.log(nick,msg)}></Input>
-            <Chat></Chat>
-        </div>
+        <Provider store = {store} >
+            <div className="App container">
+                <h1 className="display-4">Send Message</h1>
+                <I/>
+                <View/>
+                <Chat></Chat>
+            </div>
+        </Provider>
     );
   }
 }

@@ -23,11 +23,10 @@ app.get('/messages', function (req, res) {
 app.post('/messages',function(req, res){
   app.use(bodyParser.json())
 
-  req.body.timestamp = new Date().toUTCString();
+  req.body
   messages.push(req.body)
   res.status(201).send(req.body)
 });
-
 
 
 app.listen(4000, function () {

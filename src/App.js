@@ -2,21 +2,47 @@ import React, { Component } from 'react';
 import logo from './logo.svg';
 import './App.css';
 import {Provider, connect}   from 'react-redux';
-import {createStore, combineReducers} from 'redux';
+import {createStore, combineReducers, applyMiddleware} from 'redux';
+import thunk from 'redux-thunk';
+
+
+const actionPending     = () => ({ type: 'SET_STATUS', status: 'PENDING', payload: null, error: null })
+const actionResolved    = payload => ({ type: 'SET_STATUS', status: 'RESOLVED', payload, error: null })
+const actionRejected    = error => ({ type: 'SET_STATUS', status: 'REJECTED', payload: null, error })
 
 let delay = ms => new Promise (r => setTimeout(() => r(ms), ms))
 
-let store = createStore((state, action) => { //единственный редьюсер данного хранилища
+let store = createStore((state, action) => { //единственный редьюсер данного хранилища(функция, которая передается в криейтстор)
     if (state === undefined){ //redux запускает редьюсер хотя бы раз, что бы инициализировать хранилище
-        return {sendStatus: "EMPTY"};  //обязательно вернуть новый объект, а не изменить текущий state
+        return {sendStatus: "EMPTY", status: 'EMPTY'};  //обязательно вернуть новый объект, а не изменить текущий state
     }
     if (action.type === 'SEND_STATUS'){ //в каждом action должен быть type
-        return {sendStatus: action.sendStatus} //создаем новый объект базируясь на данных из предыдущего состояния
+        return {...state, sendStatus: action.sendStatus} //создаем новый объект базируясь на данных из предыдущего состояния
+    }
+    if (action.type === 'SET_STATUS'){
+        return {...state, status: action.status, payload: action.payload, error: action.error}
     }
     return state; //редьюсеров может быть несколько, в таком случае вызываются все редьюсеры, но далеко не всегда action.type будет относится к этому редьюсеру. Тогда редьюсер должен вернуть state как есть.
-})
+}, applyMiddleware(thunk))
 
 store.subscribe(()=> console.log(store.getState()))
+
+function actionFetch(){
+    return async function (dispatch){
+        while (true) {
+            await delay(2000)
+            dispatch(actionPending())
+            try {
+                dispatch(actionResolved(await fetch('http://localhost:4000/messages').json())
+                this.setState({data})
+                console.log(data)
+            }
+            catch (e) {
+                dispatch(actionRejected(e))
+            }
+        }
+    }
+}
 
 function action(name, msg){
     fetch("http://localhost:4000/messages",
@@ -48,14 +74,14 @@ class Chat extends Component {
         this.state = {data: []}
     }
 
-    async componentDidMount() {
-        while (true) {
-            await delay(2000)
-            let data = await (await fetch('http://localhost:4000/messages')).json()
-            this.setState({data})
-            console.log(data)
-        }
-    }
+    // async componentDidMount() {
+    //     while (true) {
+    //         await delay(2000)
+    //         let data = await (await fetch('http://localhost:4000/messages')).json()
+    //         this.setState({data})
+    //         console.log(data)
+    //     }
+    // }
 
     render() {
         return (
@@ -70,7 +96,6 @@ class Input extends Component{
     constructor(props) {
         super(props);
         this.state = {value: ''};
-
         this.handleChangeNick = this.handleChangeNick.bind(this);
         this.handleChangeMsg = this.handleChangeMsg.bind(this);
     }

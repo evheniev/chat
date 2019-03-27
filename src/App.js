@@ -27,19 +27,19 @@ let store = createStore((state, action) => { //единственный редь
 
 store.subscribe(()=> console.log(store.getState()))
 
+
 function actionFetch(){
     return async function (dispatch){
-        while (true) {
-            await delay(2000)
-            dispatch(actionPending())
-            try {
-                dispatch(actionResolved(await fetch('http://localhost:4000/messages').json())
-                this.setState({data})
-                console.log(data)
-            }
-            catch (e) {
-                dispatch(actionRejected(e))
-            }
+        dispatch(actionPending())
+        try {
+            while (true) {
+                    await delay(2000)
+                    dispatch(actionResolved(await fetch('http://localhost:4000/messages')))
+
+                }
+        }
+        catch (e) {
+            dispatch(actionRejected(e))
         }
     }
 }
@@ -67,6 +67,7 @@ function action(name, msg){
 }
 
 store.dispatch(action())
+store.dispatch(actionFetch())
 
 class Chat extends Component {
     constructor (props) {

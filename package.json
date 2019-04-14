@@ -5,13 +5,18 @@
   "dependencies": {
     "cors": "^2.8.5",
     "express": "^4.16.4",
+    "mariadb": "^2.0.3",
     "mongodb": "^3.2.2",
+    "mysql": "^2.16.0",
+    "mysql2": "^1.6.5",
     "react": "^16.8.3",
     "react-dom": "^16.8.3",
     "react-redux": "^6.0.1",
+    "react-router-dom": "^5.0.0",
     "react-scripts": "2.1.5",
     "redux": "^4.0.1",
-    "redux-thunk": "^2.3.0"
+    "redux-thunk": "^2.3.0",
+    "sequelize": "^5.3.3"
   },
   "scripts": {
     "start": "react-scripts start",

@@ -4,6 +4,9 @@ import './App.css';
 import {Provider, connect}   from 'react-redux';
 import {createStore, combineReducers, applyMiddleware} from 'redux';
 import thunk from 'redux-thunk';
+import {Router, Route, Link} from 'react-router-dom';
+import createHistory from "history/createBrowserHistory";
+
 
 
 const actionPending     = () => ({ type: 'SET_STATUS', status: 'PENDING', payload: null, error: null })
@@ -28,24 +31,25 @@ let store = createStore((state, action) => { //единственный редь
 store.subscribe(()=> console.log(store.getState()))
 
 
-function actionFetch(){
-    return async function (dispatch){
-        dispatch(actionPending())
-        try {
-            while (true) {
-                    await delay(2000)
-                    dispatch(actionResolved(await fetch('http://localhost:4000/messages')))
-
-                }
-        }
-        catch (e) {
-            dispatch(actionRejected(e))
-        }
-    }
-}
+// function actionFetch(){
+//     return async function (dispatch){
+//         dispatch(actionPending())
+//         try {
+//             while (true) {
+//                     await delay(2000)
+//                     dispatch(actionResolved(await fetch('http://localhost:4000/messages'))
+//                         // .then( response => response.json())
+//                     )
+//                 }
+//         }
+//         catch (e) {
+//             dispatch(actionRejected(e))
+//         }
+//     }
+// }
 
 function action(name, msg){
-    fetch("http://localhost:4000/messages",
+    fetch("http://localhost:4000/message",
        {
            headers: {
                'Accept': 'application/json',
@@ -66,8 +70,7 @@ function action(name, msg){
     }
 }
 
-store.dispatch(action())
-store.dispatch(actionFetch())
+// store.dispatch(actionFetch())
 
 class Chat extends Component {
     constructor (props) {
@@ -75,19 +78,19 @@ class Chat extends Component {
         this.state = {data: []}
     }
 
-    // async componentDidMount() {
-    //     while (true) {
-    //         await delay(2000)
-    //         let data = await (await fetch('http://localhost:4000/messages')).json()
-    //         this.setState({data})
-    //         console.log(data)
-    //     }
-    // }
+    async componentDidMount() {
+        while (true) {
+            await delay(2000)
+            let data = await (await fetch('http://localhost:4000/message')).json()
+            this.setState({data})
+            console.log(data)
+        }
+    }
 
     render() {
         return (
             <div className = "chat">
-                <div>{this.state.data.length ? this.state.data.map(msg => <div>{msg.nickname} : {msg.message} TIME: {msg.timestamp}</div>): "loading..."}</div>
+                <div>{this.state.data.length ? this.state.data.map(msg => <div>{msg.nickname} : {msg.message} : {msg.time}</div>): "loading..."}</div>
             </div>
         );
     }
@@ -124,6 +127,8 @@ class Input extends Component{
 }
 let View = connect(s => s)(props => <div>{props.sendStatus}</div>)
 let I = connect(null, {onSend: action})(Input)
+
+
 
 class App extends Component {
   render() {

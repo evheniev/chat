@@ -3,76 +3,60 @@ var cors = require('cors')
 var app = express();
 const bodyParser = require('body-parser');
 var htttp = require('http');
-const MongoClient = require("mongodb").MongoClient;
-const objectId = require("mongodb").ObjectID;
-
-const mongoClient = new MongoClient("mongodb://localhost:27017/", { useNewUrlParser: true });
-
-let dbClient;
+var Sequelize = require('sequelize');
 
 app.use(cors())
 app.use(express.static('public'));
 app.use(bodyParser.json())
 
+var sequelize = new Sequelize('chat', 'root', '12345', {
+  dialect: 'mariadb'
+})
+
+var User = sequelize.define('User', {
+  username: Sequelize.STRING,
+})
+
+var Msg = sequelize.define('Msg', {
+  text: Sequelize.STRING,
+})
+
 app.use(express.static(__dirname + "/public"));
 
-// mongoClient.connect(function(err, client){
-//     if(err) return console.log(err);
-//     dbClient = client;
-//     app.locals.collection = client.db("chatdb").collection("messages");
-//     app.listen(4000, function(){
-//         console.log("Сервер ожидает подключения...");
-//     });
-// });
-
-
-
-var messages = [{
-    nickname : "nickname",
-    message : "message"
-  }];
-
-
-app.get('/messages', function (req, res) {
-    // const collection = req.app.locals.collection;
-    // collection.find({}).toArray(function(err, messages){
-    //     if(err) return console.log(err);
-        res.send(messages);
-    // });
+app.get('/message', function (req, res) {
+    User.findAll({
+        attributes: ['username']
+    })
+    .then(users => {
+        console.log(users);
+        res.send(users)}
+    )
 })
 
 
-// app.post("/api/messages", function (req, res) {
-//
-//     app.use(bodyParser.json())
-//     if(!req.body) return res.sendStatus(400);
-//
-//     const name = req.body.nickname;
-//     const msg = req.body.message;
-//     const time = req.body.timestamp = new Date().getTime();
-//     const user = {name: name, msg: msg, time: time};
-//
-//     const collection = req.app.locals.collection;
-//     collection.insertOne(user, function(err, result){
-//
-//         if(err) return console.log(err);
-//         res.send(user);
-//     });
-// });
 
-app.post('/messages',function(req, res){
-  app.use(bodyParser.json())
+app.post("/message", function (req, res) {
+    app.use(bodyParser.json())
+    if(!req.body) return res.sendStatus(400);
 
-  req.body.timestamp = new Date().getTime();
-  messages.push(req.body)
-  res.status(201).send(req.body)
+    sequelize.sync().then(function() {
+      User.create({
+        username: req.body.nickname,
+    }).then(function(username) {
+        console.log(username)
+      })
+    })
+
+    sequelize.sync().then(function() {
+     Msg.create({
+        text: req.body.message,
+    }).then(function(text) {
+        console.log(text)
+      })
+    })
+
 });
 
 app.listen(4000, function () {
   console.log('Example app listening on port 4000!');
 });
-
-// process.on("SIGINT", () => {
-//     dbClient.close();
-//     process.exit();
-// });

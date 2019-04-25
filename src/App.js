@@ -90,7 +90,7 @@ class Chat extends Component {
     render() {
         return (
             <div className = "chat">
-                <div>{this.state.data.length ? this.state.data.map(msg => <div>{msg.nickname} : {msg.message} : {msg.time}</div>): "loading..."}</div>
+                <div>{this.state.data.length ? this.state.data.map(msg => <div>{msg.username} : {msg.message} </div>): "loading..."}</div>
             </div>
         );
     }
